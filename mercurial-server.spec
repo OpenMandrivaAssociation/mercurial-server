@@ -12,7 +12,7 @@ Group:		Development/Other
 Url:		http://hg.opensource.lshift.net/mercurial-server/
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch:	noarch
-Requires:	mercurial, openssh
+Requires:	mercurial, openssh-server
 
 %description
 mercurial-server makes a group of repositories available to the developers
