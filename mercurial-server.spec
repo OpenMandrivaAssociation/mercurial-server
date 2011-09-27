@@ -1,47 +1,44 @@
 %define name	mercurial-server
-%define version	0.6
-%define release %mkrel 2
+%define version	1.2
+%define release %mkrel 1
 
 Summary:	Mercurial authentication and authorization tools
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Source0:	%{name}-%{version}.tar.lzma
+Source0:	http://dev.lshift.net/paul/%{name}/%{name}_%{version}.tar.gz
 License:	GPLv2
 Group:		Development/Other
-Url:		http://hg.opensource.lshift.net/mercurial-server/
+Url:		http://www.lshift.net/mercurial-server.html
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch:	noarch
 Requires:	mercurial, openssh-server
+BuildRequires:	xsltproc, docbook-style-xsl
 
 %description
-mercurial-server makes a group of repositories available to the developers
-you choose, identified by ssh keys, with easy key and access management
-based on hg.
+mercurial-server gives your developers remote read/write access to centralized
+Mercurial repositories using SSH public key authentication; it provides
+convenient and fine-grained key management and access control. 
 
 %prep
-%setup -q
+%setup -q -n %{name}_%{version}.orig
 
 %install
 %__rm -rf %{buildroot}
-%__install -d -m 755 %{buildroot}%{py_sitedir}/mercurialserver/
-%__install -d -m 755 %{buildroot}%{_datadir}/mercurial-server/init/
 
-%__install -m 755 src/hg-ssh %{buildroot}%{_datadir}/mercurial-server/
-%__install -m 755 src/refresh-auth %{buildroot}%{_datadir}/mercurial-server/
-%__install -m 755 src/init/hginit %{buildroot}%{_datadir}/mercurial-server/init/
-%__install -m 644 src/init/hgadmin-hgrc %{buildroot}%{_datadir}/mercurial-server/init/
-%__install -m 755 src/mercurialserver/* %{buildroot}%{py_sitedir}/mercurialserver/
-
-%__install -d -m 755 %{buildroot}%{_sysconfdir}/mercurial-server/keys
-
-%__install -m 644 src/init/conf/remote-hgrc %{buildroot}%{_sysconfdir}/mercurial-server/
+%__install -d -m 755 %{buildroot}%{_sysconfdir}/mercurial-server/keys/root
+%__install -d -m 755 %{buildroot}%{_sysconfdir}/mercurial-server/keys/users
 %__install -m 644 src/init/conf/access.conf %{buildroot}%{_sysconfdir}/mercurial-server/
 
-%__install -d -m 755 root %{buildroot}%{_sysconfdir}/mercurial-server/keys/root/
-%__install -d -m 755 %{buildroot}%{_sysconfdir}/mercurial-server/keys/users/
+%__install -d -m 755 %{buildroot}%{_sysconfdir}/remote-hgrc.d
+%__install -m 644 src/init/conf/remote-hgrc.d/* %{buildroot}%{_sysconfdir}/remote-hgrc.d
+
+PYTHONDONTWRITEBYTECODE= %__python setup.py install --root=%{buildroot} --install-scripts=%{_datadir}/%{name} --install-data=%{_datadir}/%{name} --record=FILE_LIST
 
 %__install -m 755 -d %{buildroot}/var/hg
+
+pushd doc
+xsltproc --nonet -o ../manual.html /usr/share/sgml/docbook/xsl-stylesheets/html/docbook.xsl manual.docbook
 
 %clean
 %__rm -rf %{buildroot}
@@ -50,13 +47,16 @@ based on hg.
 # Need to run usermod -U twice to unlock created account:
 if ! getent passwd hg 2>&1 > /dev/null; then \
    /usr/sbin/useradd -r -m -d /var/hg -s /bin/bash -c "Mercurial repository server user" hg && \
-   /usr/sbin/usermod -U hg && /usr/sbin/usermod -U hg 
+   /usr/sbin/usermod -U hg && /usr/sbin/usermod -U hg
 fi
+
+# .mercurial-server needs to be in the hg user directory:
+[ ! -e ~hg/.mercurial-server ] && /sbin/su hg -c "install -m 600 /etc/mercurial-server/init/dot-mercurial-server ~hg/.mercurial-server" 
 
 %post
 [ -d /var/hg ] && [ ! -d /var/hg/repos ] && \
 chown -R hg:hg /var/hg && \
-/bin/su hg -c "/usr/share/mercurial-server/init/hginit /usr/share/mercurial-server"
+/bin/su hg -c "/usr/share/mercurial-server/init/hginit /usr/share/mercurial-server" 
 
 cat <<EOF
 -------------------------------------------------------------------------------
@@ -69,16 +69,11 @@ EOF
 %postun
 /usr/sbin/userdel -r hg
 
-%files
+%files -f FILE_LIST
 %defattr(-,root,root)
-%doc LICENSE README doc/*
+%doc CREDITS LICENSE NEWS README manual.html
+%config(noreplace) %{_sysconfdir}/mercurial-server/
 %{_sysconfdir}/mercurial-server/access.conf
-%{_sysconfdir}/mercurial-server/remote-hgrc
-%{_sysconfdir}/mercurial-server/keys/root/
-%{_sysconfdir}/mercurial-server/keys/users/
-%{_datadir}/mercurial-server/hg-ssh
-%{_datadir}/mercurial-server/refresh-auth
-%{_datadir}/mercurial-server/init/hginit
-%{_datadir}/mercurial-server/init/hgadmin-hgrc
-%{py_sitedir}/mercurialserver/*
+%{_sysconfdir}/remote-hgrc.d/access.rc
+%{_sysconfdir}/remote-hgrc.d/logging.rc
 /var/hg
