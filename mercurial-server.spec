@@ -1,6 +1,6 @@
 %define name	mercurial-server
 %define version	1.2
-%define release %mkrel 1
+%define release %mkrel 2
 
 Summary:	Mercurial authentication and authorization tools
 Name:		%{name}
@@ -51,7 +51,7 @@ if ! getent passwd hg 2>&1 > /dev/null; then \
 fi
 
 # .mercurial-server needs to be in the hg user directory:
-[ ! -e ~hg/.mercurial-server ] && /sbin/su hg -c "install -m 600 /etc/mercurial-server/init/dot-mercurial-server ~hg/.mercurial-server" 
+[ ! -e ~hg/.mercurial-server ] && /bin/su hg -c "install -m 600 /etc/mercurial-server/init/dot-mercurial-server ~hg/.mercurial-server" 
 
 %post
 [ -d /var/hg ] && [ ! -d /var/hg/repos ] && \
