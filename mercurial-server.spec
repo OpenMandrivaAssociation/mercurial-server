@@ -73,7 +73,6 @@ EOF
 %defattr(-,root,root)
 %doc CREDITS LICENSE NEWS README manual.html
 %config(noreplace) %{_sysconfdir}/mercurial-server/
-%{_sysconfdir}/mercurial-server/access.conf
 %{_sysconfdir}/remote-hgrc.d/access.rc
 %{_sysconfdir}/remote-hgrc.d/logging.rc
 /var/hg
