@@ -76,3 +76,23 @@ EOF
 %{_sysconfdir}/remote-hgrc.d/access.rc
 %{_sysconfdir}/remote-hgrc.d/logging.rc
 /var/hg
+
+
+%changelog
+* Fri Mar 16 2012 Lev Givon <lev@mandriva.org> 1.2-2mdv2012.0
++ Revision: 785262
+- Correct path to su.
+
+* Wed Sep 28 2011 Lev Givon <lev@mandriva.org> 1.2-1
++ Revision: 701588
+- Update to 1.2.
+
+* Tue Nov 02 2010 Michael Scherer <misc@mandriva.org> 0.6-2mdv2011.0
++ Revision: 592414
+- rebuild for python 2.7
+
+* Fri Jul 24 2009 Lev Givon <lev@mandriva.org> 0.6-1mdv2010.0
++ Revision: 399525
+- imported package mercurial-server
+
+
