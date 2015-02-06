@@ -1,6 +1,6 @@
 %define name	mercurial-server
 %define version	1.2
-%define release %mkrel 2
+%define release 3
 
 Summary:	Mercurial authentication and authorization tools
 Name:		%{name}
