@@ -9,7 +9,7 @@ Release:	%{release}
 Source0:	http://dev.lshift.net/paul/%{name}/%{name}_%{version}.tar.gz
 License:	GPLv2
 Group:		Development/Other
-Url:		http://www.lshift.net/mercurial-server.html
+Url:		https://www.lshift.net/mercurial-server.html
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch:	noarch
 Requires:	mercurial, openssh-server
